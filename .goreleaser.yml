@@ -1,0 +1,36 @@
+version: 2
+# .goreleaser.yml
+before:
+  hooks:
+    - go mod tidy
+builds:
+  - env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - windows
+      - darwin
+archives:
+  - name_template: '{{ .ProjectName }}_{{ .Version }}_{{ .Os | title }}_{{ .Arch | replace "386" "i386" | replace "amd64" "x86_64" }}{{ with .Goamd64 }}_{{ . }}{{ end }}{{ with .Goarm }}_{{ . }}{{ end }}{{ with .Go386 }}_{{ . }}{{ end }}'
+checksum:
+  name_template: 'checksums.txt'
+snapshot:
+  version_template: "{{ incpatch .Version }}-next"
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - '^docs:'
+      - '^test:'
+nfpms:
+  -
+    id: "git-barcode-sheet"
+    package_name: "git-barcode-sheet"
+    homepage: "https://github.com/arran4/git-barcode-sheet"
+    maintainer: "Arran Ubels <arran@ubels.com.au>"
+    description: "chat barcode sheet generator."
+    license: "MIT"
+    formats:
+      - "deb"
+      - "rpm"
+    bindir: "/usr/bin"
