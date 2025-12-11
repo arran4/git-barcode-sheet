@@ -110,7 +110,7 @@ func main() {
 
 	// Title (larger font)
 	dc.SetColor(color.Black)
-	dc.SetFontFace(mustGoRegularFace(28))
+	dc.SetFontFace(mustGoRegularFace(36))
 	title := "Git Barcode Sheet – One Scan = One Command"
 	dc.DrawStringAnchored(title, float64(width)/2, margin/2, 0.5, 0.5)
 
@@ -171,19 +171,19 @@ func main() {
 			dc.DrawImage(scaled, int(bx), int(by))
 
 			// Label & description
-			labelY := by + float64(barHeight) + 10
+			labelY := by + float64(barHeight) + 12
 
 			dc.SetColor(color.Black)
-			dc.SetFontFace(mustGoRegularFace(13))
+			dc.SetFontFace(mustGoRegularFace(16))
 			label := cmd.Label
 			if label == "" {
 				label = cmd.Code
 			}
 			dc.DrawStringAnchored(label, cx, labelY, 0.5, 0)
 
-			descY := labelY + 14
-			dc.SetFontFace(mustGoRegularFace(10))
-			dc.DrawStringWrapped(cmd.Description, x+8, descY, 0, 0, cellWidth-16, 1.3, gg.AlignCenter)
+			descY := labelY + 18
+			dc.SetFontFace(mustGoRegularFace(12))
+			dc.DrawStringWrapped(cmd.Description, x+8, descY, 0, 0, cellWidth-16, 1.4, gg.AlignCenter)
 
 		} else {
 			// --- QR for long commands ---
@@ -205,19 +205,19 @@ func main() {
 			by := y + 8
 			dc.DrawImage(scaled, int(bx), int(by))
 
-			labelY := by + float64(qrSize) + 10
+			labelY := by + float64(qrSize) + 12
 
 			dc.SetColor(color.Black)
-			dc.SetFontFace(mustGoRegularFace(13))
+			dc.SetFontFace(mustGoRegularFace(16))
 			label := cmd.Label
 			if label == "" {
 				label = cmd.Code
 			}
 			dc.DrawStringAnchored(label, cx, labelY, 0.5, 0)
 
-			descY := labelY + 14
-			dc.SetFontFace(mustGoRegularFace(10))
-			dc.DrawStringWrapped(cmd.Description, x+8, descY, 0, 0, cellWidth-16, 1.3, gg.AlignCenter)
+			descY := labelY + 18
+			dc.SetFontFace(mustGoRegularFace(12))
+			dc.DrawStringWrapped(cmd.Description, x+8, descY, 0, 0, cellWidth-16, 1.4, gg.AlignCenter)
 		}
 	}
 
@@ -241,9 +241,9 @@ func main() {
 			dc.DrawImage(footerScaled, int(fbX), int(fbY))
 
 			// Footer text just above page bottom
-			textY := float64(height) - 10
+			textY := float64(height) - 12
 			dc.SetColor(color.Black)
-			dc.SetFontFace(mustGoRegularFace(11))
+			dc.SetFontFace(mustGoRegularFace(12))
 			dc.DrawStringAnchored(footerText, float64(width)/2, textY, 0.5, 0)
 		}
 	}
