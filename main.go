@@ -171,18 +171,18 @@ func main() {
 			dc.DrawImage(scaled, int(bx), int(by))
 
 			// Label & description
-			labelY := by + float64(barHeight) + 12
+			labelY := by + float64(barHeight) + 15
 
 			dc.SetColor(color.Black)
-			dc.SetFontFace(mustGoRegularFace(16))
+			dc.SetFontFace(mustGoRegularFace(20))
 			label := cmd.Label
 			if label == "" {
 				label = cmd.Code
 			}
 			dc.DrawStringAnchored(label, cx, labelY, 0.5, 0)
 
-			descY := labelY + 18
-			dc.SetFontFace(mustGoRegularFace(12))
+			descY := labelY + 22
+			dc.SetFontFace(mustGoRegularFace(16))
 			dc.DrawStringWrapped(cmd.Description, x+8, descY, 0, 0, cellWidth-16, 1.4, gg.AlignCenter)
 
 		} else {
@@ -205,18 +205,18 @@ func main() {
 			by := y + 8
 			dc.DrawImage(scaled, int(bx), int(by))
 
-			labelY := by + float64(qrSize) + 12
+			labelY := by + float64(qrSize) + 15
 
 			dc.SetColor(color.Black)
-			dc.SetFontFace(mustGoRegularFace(16))
+			dc.SetFontFace(mustGoRegularFace(20))
 			label := cmd.Label
 			if label == "" {
 				label = cmd.Code
 			}
 			dc.DrawStringAnchored(label, cx, labelY, 0.5, 0)
 
-			descY := labelY + 18
-			dc.SetFontFace(mustGoRegularFace(12))
+			descY := labelY + 22
+			dc.SetFontFace(mustGoRegularFace(16))
 			dc.DrawStringWrapped(cmd.Description, x+8, descY, 0, 0, cellWidth-16, 1.4, gg.AlignCenter)
 		}
 	}
