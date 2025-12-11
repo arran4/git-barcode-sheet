@@ -148,77 +148,57 @@ func main() {
 		dc.DrawRectangle(x, y, cellWidth, cellHeight)
 		dc.Stroke()
 
-		// Choose barcode type based on length
+		// --- Refactored Layout: Label -> Barcode -> Description ---
+
+		// 1. Label (common to both barcode types)
+		labelY := y + 20
+		dc.SetColor(color.Black)
+		dc.SetFontFace(mustGoRegularFace(24)) // Increased label font size
+		label := cmd.Label
+		if label == "" {
+			label = cmd.Code
+		}
+		dc.DrawStringAnchored(label, cx, labelY, 0.5, 0)
+
+		// Barcode generation (specific to type)
+		var scaled barcode.Barcode
+		var err error
+
 		if len(cmd.Code) <= shortCmdMaxLen {
 			// --- Code128 for short commands ---
 			barWidth := int(cellWidth * 0.9)
 			barHeight := int(cellHeight * 0.45)
-
-			raw, err := code128.Encode(cmd.Code)
-			if err != nil {
-				log.Printf("Code128 encode error for %q: %v", cmd.Code, err)
+			raw, errEncode := code128.Encode(cmd.Code)
+			if errEncode != nil {
+				log.Printf("Code128 encode error for %q: %v", cmd.Code, errEncode)
 				continue
 			}
-
-			scaled, err := barcode.Scale(raw, barWidth, barHeight)
-			if err != nil {
-				log.Printf("Code128 scale error for %q: %v", cmd.Code, err)
-				continue
-			}
-
-			bx := cx - float64(scaled.Bounds().Dx())/2
-			by := y + 6
-			dc.DrawImage(scaled, int(bx), int(by))
-
-			// Label & description
-			labelY := by + float64(barHeight) + 15
-
-			dc.SetColor(color.Black)
-			dc.SetFontFace(mustGoRegularFace(20))
-			label := cmd.Label
-			if label == "" {
-				label = cmd.Code
-			}
-			dc.DrawStringAnchored(label, cx, labelY, 0.5, 0)
-
-			descY := labelY + 22
-			dc.SetFontFace(mustGoRegularFace(16))
-			dc.DrawStringWrapped(cmd.Description, x+8, descY, 0, 0, cellWidth-16, 1.4, gg.AlignCenter)
-
+			scaled, err = barcode.Scale(raw, barWidth, barHeight)
 		} else {
 			// --- QR for long commands ---
-			qrSize := int(math.Min(cellWidth*0.75, cellHeight*0.6))
-
-			raw, err := qr.Encode(cmd.Code, qr.M, qr.Auto)
-			if err != nil {
-				log.Printf("QR encode error for %q: %v", cmd.Code, err)
+			qrSize := int(math.Min(cellWidth*0.75, cellHeight*0.5))
+			raw, errEncode := qr.Encode(cmd.Code, qr.M, qr.Auto)
+			if errEncode != nil {
+				log.Printf("QR encode error for %q: %v", cmd.Code, errEncode)
 				continue
 			}
-
-			scaled, err := barcode.Scale(raw, qrSize, qrSize)
-			if err != nil {
-				log.Printf("QR scale error for %q: %v", cmd.Code, err)
-				continue
-			}
-
-			bx := cx - float64(scaled.Bounds().Dx())/2
-			by := y + 8
-			dc.DrawImage(scaled, int(bx), int(by))
-
-			labelY := by + float64(qrSize) + 15
-
-			dc.SetColor(color.Black)
-			dc.SetFontFace(mustGoRegularFace(20))
-			label := cmd.Label
-			if label == "" {
-				label = cmd.Code
-			}
-			dc.DrawStringAnchored(label, cx, labelY, 0.5, 0)
-
-			descY := labelY + 22
-			dc.SetFontFace(mustGoRegularFace(16))
-			dc.DrawStringWrapped(cmd.Description, x+8, descY, 0, 0, cellWidth-16, 1.4, gg.AlignCenter)
+			scaled, err = barcode.Scale(raw, qrSize, qrSize)
 		}
+
+		if err != nil {
+			log.Printf("Barcode scale error for %q: %v", cmd.Code, err)
+			continue
+		}
+
+		// 2. Barcode (common drawing logic)
+		bx := cx - float64(scaled.Bounds().Dx())/2
+		by := labelY + 35 // Position barcode below label
+		dc.DrawImage(scaled, int(bx), int(by))
+
+		// 3. Description (common drawing logic)
+		descY := by + float64(scaled.Bounds().Dy()) + 15
+		dc.SetFontFace(mustGoRegularFace(22)) // Increased description font size
+		dc.DrawStringWrapped(cmd.Description, x+8, descY, 0, 0, cellWidth-16, 1.4, gg.AlignCenter)
 	}
 
 	// --- Footer: repo QR + text --- (kept inside the page)
